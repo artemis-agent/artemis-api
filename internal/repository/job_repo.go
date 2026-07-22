@@ -109,10 +109,6 @@ func (r *JobRepo) GetByID(ctx context.Context, id uuid.UUID) (*model.Job, error)
 }
 
 func (r *JobRepo) SearchByVector(ctx context.Context, embedding []float32, f JobFilter, limit int) ([]model.Job, error) {
-	return r.searchByVectorDirect(ctx, embedding, f, limit)
-}
-
-func (r *JobRepo) searchByVectorDirect(ctx context.Context, embedding []float32, f JobFilter, limit int) ([]model.Job, error) {
 	conditions := []string{"j.embedding IS NOT NULL", "j.is_active = true"}
 	args := []any{}
 	argIdx := 1

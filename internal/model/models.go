@@ -80,17 +80,6 @@ func (j *Job) ToPreview() JobPreview {
 	}
 }
 
-type ScrapeRun struct {
-	ID           uuid.UUID  `json:"id"`
-	CompanyID    uuid.UUID  `json:"company_id"`
-	Status       string     `json:"status"`
-	JobsFound    int        `json:"jobs_found"`
-	JobsNew      int        `json:"jobs_new"`
-	ErrorMessage *string    `json:"error_message,omitempty"`
-	StartedAt    time.Time  `json:"started_at"`
-	CompletedAt  *time.Time `json:"completed_at,omitempty"`
-}
-
 type Stats struct {
 	TotalJobs      int       `json:"total_jobs"`
 	ActiveJobs     int       `json:"active_jobs"`
@@ -138,25 +127,4 @@ type Resume struct {
 	ParsedAt   *time.Time      `json:"parsed_at,omitempty"`
 }
 
-type RecommendationSignals struct {
-	VectorSimilarity float64 `json:"vector_similarity"`
-	SkillOverlap     float64 `json:"skill_overlap"`
-	CategoryMatch    float64 `json:"category_match"`
-	LocationMatch    float64 `json:"location_match"`
-	SeniorityMatch   float64 `json:"seniority_match"`
-	RoleMatch        float64 `json:"role_match"`
-	Recency          float64 `json:"recency"`
-}
 
-type Recommendation struct {
-	JobID         string                `json:"job_id"`
-	Title         string                `json:"title"`
-	URL           string                `json:"url"`
-	Location      *string               `json:"location,omitempty"`
-	CompanyName   string                `json:"company_name"`
-	CompanySlug   string                `json:"company_slug"`
-	Source        *string               `json:"source,omitempty"`
-	Score         float64               `json:"score"`
-	Signals       RecommendationSignals `json:"signals"`
-	MatchedSkills []string              `json:"matched_skills,omitempty"`
-}

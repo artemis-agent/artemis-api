@@ -13,35 +13,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type createUserBody struct {
-	Email    string  `json:"email"`
-	Name     string  `json:"name"`
-	Location *string `json:"location,omitempty"`
-}
-
-func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var body createUserBody
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid JSON body")
-		return
-	}
-	if body.Email == "" || body.Name == "" {
-		writeError(w, http.StatusBadRequest, "email and name required")
-		return
-	}
-
-	user, err := h.users.Create(r.Context(), body.Email, body.Name, body.Location)
-	if err != nil {
-		if strings.Contains(err.Error(), "duplicate key") {
-			writeError(w, http.StatusConflict, "user with this email already exists")
-			return
-		}
-		writeError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	writeJSON(w, http.StatusCreated, user)
-}
-
 func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {

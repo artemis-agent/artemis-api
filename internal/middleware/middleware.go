@@ -50,11 +50,6 @@ func CORSWithOrigins(allowedOrigins string) func(http.Handler) http.Handler {
 	}
 }
 
-// CORS is a simple permissive CORS for dev (kept for backward compat).
-func CORS(next http.Handler) http.Handler {
-	return CORSWithOrigins("*")(next)
-}
-
 // APIKeyAuth validates X-API-Key header for mutating endpoints.
 func APIKeyAuth(apiKey string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {

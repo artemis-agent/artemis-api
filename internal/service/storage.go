@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"strings"
 
@@ -52,11 +51,4 @@ func (s *StorageClient) Upload(ctx context.Context, key string, data []byte, con
 	return err
 }
 
-func (s *StorageClient) Download(ctx context.Context, key string) ([]byte, error) {
-	obj, err := s.client.GetObject(ctx, s.bucket, key, minio.GetObjectOptions{})
-	if err != nil {
-		return nil, err
-	}
-	defer obj.Close()
-	return io.ReadAll(obj)
-}
+

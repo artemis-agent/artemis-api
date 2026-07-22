@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/artemis/artemis-api/internal/model"
 	"github.com/google/uuid"
@@ -57,8 +58,7 @@ func (r *UserRepo) CreateWithPassword(ctx context.Context, email, name, password
 	q := `INSERT INTO users (id, email, name, password_hash, location) VALUES ($1, $2, $3, $4, $5) RETURNING ` + userReturnCols
 	u, err := scanUser(r.pool.QueryRow(ctx, q, id, email, name, passwordHash, loc))
 	if err != nil {
-		if err.Error() == `ERROR: duplicate key value violates unique constraint "users_email_key" (SQLSTATE 23505)` ||
-			contains(err.Error(), "23505") {
+		if strings.Contains(err.Error(), "23505") {
 			return nil, fmt.Errorf("email already exists")
 		}
 		return nil, fmt.Errorf("create user: %w", err)
@@ -82,19 +82,6 @@ func (r *UserRepo) GetByEmailWithPassword(ctx context.Context, email string) (*m
 		return nil, "", err
 	}
 	return &u, passwordHash, nil
-}
-
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsSubstr(s, substr))
-}
-
-func containsSubstr(s, sub string) bool {
-	for i := 0; i <= len(s)-len(sub); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
-		}
-	}
-	return false
 }
 
 func (r *UserRepo) Update(ctx context.Context, id uuid.UUID, name string, location *string) (*model.User, error) {
@@ -222,12 +209,6 @@ func (r *UserRepo) CompleteOnboarding(ctx context.Context, userID uuid.UUID, hea
 		profile = $9, onboarding_completed = true, updated_at = NOW()
 		WHERE id = $1 RETURNING ` + userReturnCols
 	return scanUser(r.pool.QueryRow(ctx, q, userID, headline, summary, seniorityLevel, yearsExp, location, desiredRoles, skills, profile))
-}
-
-func (r *UserRepo) UpdateProfile(ctx context.Context, userID uuid.UUID, profile json.RawMessage, score int, assessment string) (*model.User, error) {
-	q := `UPDATE users SET profile = $2, profile_score = $3, profile_assessment = $4, updated_at = NOW()
-		WHERE id = $1 RETURNING ` + userReturnCols
-	return scanUser(r.pool.QueryRow(ctx, q, userID, profile, score, assessment))
 }
 
 func (r *UserRepo) SetSecurityQuestion(ctx context.Context, userID uuid.UUID, question, answerHash string) error {
